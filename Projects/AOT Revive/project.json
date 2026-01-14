@@ -1,0 +1,11 @@
+{
+  "title": "AOT Revive",
+  "tagline": "VR Fangame for Meta Quest 2/3",
+  "description": "A Unity-based VR tool for exploring MRI volumes with real-time shader fading and orbital controls.",
+  "tech": ["Unity", "C#", "VR"],
+  "github": "https://sidequestvr.com/app/6099/attack-on-titan-revive-fan-game",
+  "media": {
+    "cover": "cover.jpg",
+    "demo": "demo.gif"
+  }
+}

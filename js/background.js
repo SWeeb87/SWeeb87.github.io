@@ -89,6 +89,13 @@ function resizeCanvas() {
 
 window.addEventListener("resize", resizeCanvas);
 
+const mouse = { x: -1000, y: -1000 }; // fuori dallo schermo inizialmente
+const FADE_RADIUS = 100; // raggio in pixel per il fade
+window.addEventListener("mousemove", (e) => {
+  mouse.x = e.clientX + window.scrollX;
+  mouse.y = e.clientY + window.scrollY;
+});
+
 // ------------------- DRAW -------------------
 ctx.textAlign = "center";
 ctx.textBaseline = "middle";
@@ -97,8 +104,8 @@ ctx.font = `${settings.cellSize}px monospace`;
 const ALPHA_BUCKETS = 12;
 
 function draw(time) {
+  ctx.fillStyle = getTextColor(); // aggiorna colore ogni frame
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = getTextColor();
 
   const t = time * settings.waveSpeed;
   let lastAlpha = -1;
@@ -117,6 +124,21 @@ function draw(time) {
     let alpha = c.baseScale * n * settings.waveAmplitude;
     if (alpha < settings.invisibleThreshold) continue;
 
+    // Calcola distanza dal mouse
+    const cellX = c.x * settings.cellSize + settings.cellSize / 2;
+    const cellY = c.y * settings.cellSize + settings.cellSize / 2;
+    const dx = cellX - mouse.x;
+    const dy = cellY - mouse.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    // Gradiente soffice attorno al mouse
+    if (dist < FADE_RADIUS) {
+      let fadeFactor = dist / FADE_RADIUS; // 0 al centro, 1 ai bordi
+      // smoothstep: graduale dall'1 al 0
+      fadeFactor = fadeFactor * fadeFactor * (3 - 2 * fadeFactor); 
+      alpha *= fadeFactor;
+    }
+
     alpha = Math.min(alpha, 1);
     const bucket = Math.floor(alpha * ALPHA_BUCKETS) / ALPHA_BUCKETS;
 
@@ -125,11 +147,7 @@ function draw(time) {
       lastAlpha = bucket;
     }
 
-    ctx.fillText(
-      c.char,
-      c.x * settings.cellSize + settings.cellSize / 2,
-      c.y * settings.cellSize + settings.cellSize / 2
-    );
+    ctx.fillText(c.char, cellX, cellY);
   }
 
   ctx.globalAlpha = 1;

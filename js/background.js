@@ -1,161 +1,138 @@
 const canvas = document.getElementById("background-canvas");
 const ctx = canvas.getContext("2d");
 
+/* ================= SETTINGS ================= */
+
 const settings = {
-  cellSize: 13,
-  waveSpeed: 0.00001,
-  waveAmplitude: 2.5,
-  invisibleThreshold: 0.19,
-  baseScaleMin: 0.2,
-  baseScaleMax: 1.0,
-  noiseGridSize: 64,
-  noiseScale: 0.15,
-  noiseSteps: 5,
-  stepBias: 7
+  cellSize: 14,
+  noiseScale: 0.03,
+  timeScale: 0.0005,
+  opacityMin: 0.01,
+  opacityMax: 1.5,
+  contrast: 5
 };
 
+/* ================= PERLIN ================= */
+
+const PERM = new Uint8Array(512);
+const P = new Uint8Array(256);
+
+for (let i = 0; i < 256; i++) P[i] = i;
+for (let i = 255; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [P[i], P[j]] = [P[j], P[i]];
+}
+for (let i = 0; i < 512; i++) PERM[i] = P[i & 255];
+
+function fade(t) {
+  return t * t * t * (t * (t * 6 - 15) + 10);
+}
+function lerp(a, b, t) {
+  return a + t * (b - a);
+}
+function grad(h, x, y) {
+  const u = (h & 1) ? -x : x;
+  const v = (h & 2) ? -y : y;
+  return u + v;
+}
+function perlin(x, y) {
+  const X = Math.floor(x) & 255;
+  const Y = Math.floor(y) & 255;
+
+  x -= Math.floor(x);
+  y -= Math.floor(y);
+
+  const u = fade(x);
+  const v = fade(y);
+
+  const aa = PERM[X + PERM[Y]];
+  const ab = PERM[X + PERM[Y + 1]];
+  const ba = PERM[X + 1 + PERM[Y]];
+  const bb = PERM[X + 1 + PERM[Y + 1]];
+
+  return lerp(
+    lerp(grad(aa, x, y), grad(ba, x - 1, y), u),
+    lerp(grad(ab, x, y - 1), grad(bb, x - 1, y - 1), u),
+    v
+  );
+}
+
+/* ================= GRID ================= */
+
 let cells = [];
-let noise = new Float32Array(settings.noiseGridSize * settings.noiseGridSize);
+let cols = 0;
+let rows = 0;
 
-// ------------------- FUNZIONI -------------------
-function quantize(value, steps) {
-  return Math.floor(value * steps) / steps;
-}
+function rebuildGrid() {
+  canvas.width = document.documentElement.scrollWidth;
+  canvas.height = document.documentElement.scrollHeight;
 
-function bias(value, b) {
-  return Math.pow(value, b);
-}
+  cols = Math.ceil(canvas.width / settings.cellSize);
+  rows = Math.ceil(canvas.height / settings.cellSize);
 
-function sampleNoise(u, v) {
-  u = (u % 1 + 1) % 1;
-  v = (v % 1 + 1) % 1;
-
-  const N = settings.noiseGridSize;
-  const x = u * N;
-  const y = v * N;
-  const x0 = Math.floor(x) % N;
-  const y0 = Math.floor(y) % N;
-  const x1 = (x0 + 1) % N;
-  const y1 = (y0 + 1) % N;
-
-  const tx = x - x0;
-  const ty = y - y0;
-
-  const a = noise[y0 * N + x0];
-  const b = noise[y0 * N + x1];
-  const c = noise[y1 * N + x0];
-  const d = noise[y1 * N + x1];
-
-  const ab = a + (b - a) * tx;
-  const cd = c + (d - c) * tx;
-
-  return ab + (cd - ab) * ty;
-}
-
-function getTextColor() {
-  const theme = document.body.getAttribute("data-theme") || "light";
-  return theme === "dark" ? "#ffffff" : "#000000";
-}
-
-// ------------------- CANVAS -------------------
-function resizeCanvas() {
-  canvas.width = document.body.scrollWidth;
-  canvas.height = document.body.scrollHeight;
-
-  // Ricrea le celle ad ogni resize
-  const cols = Math.floor(canvas.width / settings.cellSize);
-  const rows = Math.floor(canvas.height / settings.cellSize);
-  cells = [];
-  for (let y = 0; y < rows; y++) {
-    for (let x = 0; x < cols; x++) {
-      cells.push({
-        x,
-        y,
-        char: Math.random() > 0.5 ? "0" : "1",
-        baseScale: Math.random() * (settings.baseScaleMax - settings.baseScaleMin) + settings.baseScaleMin
-      });
-    }
-  }
-
-  // Inizializza noise tileabile
-  const N = settings.noiseGridSize;
-  noise = new Float32Array(N * N);
-  for (let y = 0; y < N; y++) {
-    for (let x = 0; x < N; x++) {
-      noise[y * N + x] = Math.random();
-    }
-  }
-}
-
-window.addEventListener("resize", resizeCanvas);
-
-const mouse = { x: -1000, y: -1000 }; // fuori dallo schermo inizialmente
-const FADE_RADIUS = 100; // raggio in pixel per il fade
-window.addEventListener("mousemove", (e) => {
-  mouse.x = e.clientX + window.scrollX;
-  mouse.y = e.clientY + window.scrollY;
-});
-
-// ------------------- DRAW -------------------
-ctx.textAlign = "center";
-ctx.textBaseline = "middle";
-ctx.font = `${settings.cellSize}px monospace`;
-
-const ALPHA_BUCKETS = 12;
-
-function draw(time) {
-  ctx.fillStyle = getTextColor(); // aggiorna colore ogni frame
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  const t = time * settings.waveSpeed;
-  let lastAlpha = -1;
+  cells = new Array(cols * rows);
 
   for (let i = 0; i < cells.length; i++) {
-    const c = cells[i];
+    cells[i] = Math.random() > 0.5 ? "1" : "0";
+  }
 
-    const u = c.x * settings.noiseScale + t;
-    const v = c.y * settings.noiseScale + t * 0.7;
+  ctx.font = `${settings.cellSize}px monospace`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+}
 
-    let n = sampleNoise(u, v);
-    n = Math.sin(n * Math.PI);
-    n = quantize(n, settings.noiseSteps);
-    n = bias(n, settings.stepBias);
+window.addEventListener("resize", rebuildGrid);
+// window.addEventListener("scroll", rebuildGrid);
+window.addEventListener("load", rebuildGrid);
 
-    let alpha = c.baseScale * n * settings.waveAmplitude;
-    if (alpha < settings.invisibleThreshold) continue;
+/* ================= DRAW ================= */
 
-    // Calcola distanza dal mouse
-    const cellX = c.x * settings.cellSize + settings.cellSize / 2;
-    const cellY = c.y * settings.cellSize + settings.cellSize / 2;
-    const dx = cellX - mouse.x;
-    const dy = cellY - mouse.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+function getTextColor() {
+  return (document.body.getAttribute("data-theme") === "dark")
+    ? "#ffffff"
+    : "#000000";
+}
 
-    // Gradiente soffice attorno al mouse
-    if (dist < FADE_RADIUS) {
-      let fadeFactor = dist / FADE_RADIUS; // 0 al centro, 1 ai bordi
-      // smoothstep: graduale dall'1 al 0
-      fadeFactor = fadeFactor * fadeFactor * (3 - 2 * fadeFactor); 
-      alpha *= fadeFactor;
+function draw(time) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = getTextColor();
+
+  const t = time * settings.timeScale;
+  let lastAlpha = -1;
+
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const i = y * cols + x;
+
+      let n = perlin(
+        x * settings.noiseScale + t,
+        y * settings.noiseScale + t * 0.7
+      );
+
+      n = n * 0.5 + 0.5;
+      n = Math.pow(n, settings.contrast);
+
+      let alpha =
+        settings.opacityMin +
+        n * (settings.opacityMax - settings.opacityMin);
+
+      if (alpha < 0.01) continue;
+
+      if (alpha !== lastAlpha) {
+        ctx.globalAlpha = alpha;
+        lastAlpha = alpha;
+      }
+
+      ctx.fillText(
+        cells[i],
+        x * settings.cellSize + settings.cellSize * 0.5,
+        y * settings.cellSize + settings.cellSize * 0.5
+      );
     }
-
-    alpha = Math.min(alpha, 1);
-    const bucket = Math.floor(alpha * ALPHA_BUCKETS) / ALPHA_BUCKETS;
-
-    if (bucket !== lastAlpha) {
-      ctx.globalAlpha = bucket;
-      lastAlpha = bucket;
-    }
-
-    ctx.fillText(c.char, cellX, cellY);
   }
 
   ctx.globalAlpha = 1;
   requestAnimationFrame(draw);
 }
 
-// ------------------- START -------------------
-window.addEventListener("load", () => {
-  resizeCanvas();       // ridimensiona correttamente dopo il load
-  requestAnimationFrame(draw); // parte il draw loop
-});
+requestAnimationFrame(draw);

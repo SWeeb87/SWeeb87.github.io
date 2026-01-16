@@ -18,15 +18,6 @@ window.addEventListener("scroll", () => {
   }
 });
 
-// Optional: cambia testo quando scrolla via
-window.addEventListener("scroll", () => {
-  if (window.scrollY > 50) {
-    scrollHintText.textContent = "Scroll down";
-  } else {
-    scrollHintText.textContent = "Scroll down";
-  }
-});
-
 const backToTop = document.getElementById("back-to-top");
 
 // Mostra/nascondi bottone quando scrolli
@@ -52,7 +43,7 @@ const aboutBtn = document.getElementById("About-btn");
 const aboutSection = document.getElementById("about-me");
 
 aboutBtn.addEventListener("click", () => {
-  const offset = window.innerHeight * 0.2; // leggermente sotto
+  const offset = window.innerHeight * 0.35; // leggermente sotto
   window.scrollTo({
     top: aboutSection.offsetTop - offset,
     behavior: "smooth"

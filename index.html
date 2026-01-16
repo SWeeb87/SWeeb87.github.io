@@ -9,22 +9,22 @@
 </head>
 
 <script>
-window.addEventListener("load", () => {
-  const buttons = document.querySelector(".main-buttons");
-  const projectsSection = document.querySelector(".projects-section");
+  window.addEventListener("load", () => {
+    const buttons = document.querySelector(".main-buttons");
+    const projectsSection = document.querySelector(".projects-section");
 
-  function updateProjectsPosition() {
-    const buttonsRect = buttons.getBoundingClientRect();
-    const scrollY = window.scrollY || window.pageYOffset;
-    const bottom = buttonsRect.bottom + scrollY;
+    function updateProjectsPosition() {
+      const buttonsRect = buttons.getBoundingClientRect();
+      const scrollY = window.scrollY || window.pageYOffset;
+      const bottom = buttonsRect.bottom + scrollY;
 
-    // imposta margin-top solo sulla sezione progetti
-    projectsSection.style.marginTop = (bottom + -500) + "px"; // 30px gap
-  }
+      // imposta margin-top solo sulla sezione progetti
+      projectsSection.style.marginTop = (bottom + -500) + "px"; // 30px gap
+    }
 
-  updateProjectsPosition();
-  window.addEventListener("resize", updateProjectsPosition);
-});
+    updateProjectsPosition();
+    window.addEventListener("resize", updateProjectsPosition);
+  });
 </script>
 
 
@@ -34,80 +34,96 @@ window.addEventListener("load", () => {
   <canvas id="background-canvas"></canvas>
   <header class="header">
 
-  <div id="theme-toggle">
-    <img id="theme-toggle-img" src="./Assets/Light Toggle.png" alt="Toggle Theme">
-  </div>
+    <div id="theme-toggle">
+      <img id="theme-toggle-img" src="./Assets/Light Toggle.png" alt="Toggle Theme">
+    </div>
+
+    <div id="lang-toggle" title="Lang Toggle">EN</div>
 
     <h1 class="name">
       Lorenzo Rossi<br>
       <span class="alias">SWeeb</span>
     </h1>
-    <p class="subtitle">
-      Unity VR Gameplay and Performance Developer
+    <p class="subtitle" data-lang="subtitle">
+      Subtitle Text
     </p>
 
     <!-- Pulsanti principali -->
     <div class="main-buttons">
       <div id="scroll-btn" class="scroll-button">
         <img src="./Assets/Down Squared Arrow.png" alt="Freccia giù">
-        <span>PROJECTS</span>
+        <span data-lang="projects">PROJECTS</span>
       </div>
 
       <div id="resume-btn" class="scroll-button">
         <img src="./Assets/Down Squared Arrow.png" alt="Resume">
-        <span>RESUME</span>
+        <span data-lang="resume">RESUME</span>
       </div>
 
       <div id="About-btn" class="scroll-button">
         <img src="./Assets/Down Squared Arrow.png" alt="About">
-        <span>ABOUT ME</span>
+        <span data-lang="about">ABOUT ME</span>
       </div>
     </div>
 
+
     <!-- Testo invito a scrollare -->
-<!-- Testo invito a scrollare con immagine -->
-<div id="scroll-hint-container">
-  <p id="scroll-hint-text">Scroll down</p>
-  <img id="scroll-hint-arrow" src="./Assets/Scroll Down Arrow.png" alt="Freccia scroll" />
-</div>
-
-<div id="back-to-top">
-  <img src="./Assets/Back to Top.png" alt="Back to Top">
-</div>
-
-
-<section id="about-me" class="about-section">
-  <!-- Testo a sinistra -->
-  <div class="about-card">
-    <h2>About Me</h2>
-    <p>
-      Ciao! I'm Lorenzo Rossi, also known as "SWeeb". I'm a Unity VR Gameplay & Performance Developer and
-      also an electrician. I like expressing my creativity and finding new challenges to overcome with clever solutions.
-    </p>
-    <p>
-      I create games both for PC and VR, especially for the Meta Quest 2 and 3 where performance is the key.
-      In my spare time i also design and build tech projects, like a fully autonomous Desk 3D Scanner.
-    </p>
-  </div>
-
-  <!-- Slideshow a destra -->
-  <div class="about-slideshow">
-    <div class="slides-container">
-      <div class="slide"><img src="./Assets/photo1.jpg" alt="Photo 1"></div>
-      <div class="slide"><img src="./Assets/photo2.jpg" alt="Photo 2"></div>
-      <div class="slide"><img src="./Assets/photo3.jpg" alt="Photo 3"></div>
+    <!-- Testo invito a scrollare con immagine -->
+    <div id="scroll-hint-container"> 
+      <p class="scrollHintText" data-lang="scrollHintText"
+        id="scroll-hint-text">Scroll down
+      </p>
+      <img id="scroll-hint-arrow" src="./Assets/Scroll Down Arrow.png" alt="Freccia scroll" />
     </div>
-  </div>
-</section>
 
-<div style="height: 100px;"></div>
+    <div id="back-to-top">
+      <img src="./Assets/Back to Top.png" alt="Back to Top">
+    </div>
+
+
+    <section id="about-me" class="about-section">
+      <!-- Testo a sinistra -->
+      <div class="about-card">
+        <h2>About Me</h2>
+        <p>
+          This is a long piece of text just to make sure the damn image doesn't warp, no one is going
+          to read this anyway so might aswell put some spice into it... So, how's your day going so far?
+          cuz tbh IM NOT having fun making this website
+        </p>
+        <p>
+          But at least it's cool to see it coming together, its rewarding, aaaaand im learning something new!
+          which is always good cuz yk, cant let yourself behind, always best to stay on the edge
+        </p>
+      </div>
+
+      <!-- Slideshow a destra -->
+      <div class="about-slideshow">
+        <div class="slides-container">
+          <div class="slide"><img src="./Assets/photo1.jpg" alt="Photo 1"></div>
+          <div class="slide"><img src="./Assets/photo2.jpg" alt="Photo 2"></div>
+          <div class="slide"><img src="./Assets/photo3.jpg" alt="Photo 3"></div>
+          <div class="slide"><img src="./Assets/photo4.jpg" alt="Photo 4"></div>
+          <div class="slide"><img src="./Assets/photo5.jpg" alt="Photo 5"></div>
+          <div class="slide"><img src="./Assets/photo6.jpg" alt="Photo 6"></div>
+          <div class="slide"><img src="./Assets/photo7.jpg" alt="Photo 7"></div>
+          <div class="slide"><img src="./Assets/photo8.jpg" alt="Photo 8"></div>
+          <div class="slide"><img src="./Assets/photo9.jpg" alt="Photo 9"></div>
+          <div class="slide"><img src="./Assets/photo10.jpg" alt="Photo 10"></div>
+        </div>
+      </div>
+    </section>
+
+    <div style="height: 100px;"></div>
 
     <script src="./js/projects.js"></script>
     <script src="./js/scroll.js"></script>
     <script src="./js/background.js"></script>
     <script src="./js/slideShow.js"></script>
     <script src="./js/themeToggle.js" defer></script>
+    <script src="./js/langToggle.js" defer></script>
+    <script src="./js/resumeDownload.js" defer></script>
 
 </body>
 <div id="theme-fade-overlay"></div>
+
 </html>

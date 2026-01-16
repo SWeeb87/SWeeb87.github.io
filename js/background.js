@@ -4,12 +4,13 @@ const ctx = canvas.getContext("2d");
 /* ================= SETTINGS ================= */
 
 const settings = {
-  cellSize: 14,
-  noiseScale: 0.03,
-  timeScale: 0.0005,
-  opacityMin: 0.01,
-  opacityMax: 1.5,
-  contrast: 5
+  cellSize: 13,
+  noiseScale: 0.025,
+  timeScale: 0.00025,
+  opacityMin: 0.04,
+  opacityMax: 1,
+  contrast: 5,
+  fps: 14
 };
 
 /* ================= PERLIN ================= */
@@ -19,22 +20,15 @@ const P = new Uint8Array(256);
 
 for (let i = 0; i < 256; i++) P[i] = i;
 for (let i = 255; i > 0; i--) {
-  const j = Math.floor(Math.random() * (i + 1));
+  const j = (Math.random() * (i + 1)) | 0;
   [P[i], P[j]] = [P[j], P[i]];
 }
 for (let i = 0; i < 512; i++) PERM[i] = P[i & 255];
 
-function fade(t) {
-  return t * t * t * (t * (t * 6 - 15) + 10);
-}
-function lerp(a, b, t) {
-  return a + t * (b - a);
-}
-function grad(h, x, y) {
-  const u = (h & 1) ? -x : x;
-  const v = (h & 2) ? -y : y;
-  return u + v;
-}
+const fade = t => t * t * t * (t * (t * 6 - 15) + 10);
+const lerp = (a, b, t) => a + t * (b - a);
+const grad = (h, x, y) => ((h & 1) ? -x : x) + ((h & 2) ? -y : y);
+
 function perlin(x, y) {
   const X = Math.floor(x) & 255;
   const Y = Math.floor(y) & 255;
@@ -59,50 +53,24 @@ function perlin(x, y) {
 
 /* ================= GRID ================= */
 
-function updateCanvasSize() {
-  const width = document.documentElement.scrollWidth;
-  const height = document.documentElement.scrollHeight;
-
-  if (canvas.width !== width || canvas.height !== height) {
-    canvas.width = width;
-    canvas.height = height;
-
-    // Aggiorna cols/rows solo se la dimensione cambia
-    cols = Math.ceil(canvas.width / settings.cellSize);
-    rows = Math.ceil(canvas.height / settings.cellSize);
-
-    // Mantieni la griglia esistente se possibile, altrimenti ricrea
-    if (!cells || cells.length !== cols * rows) {
-      cells = new Array(cols * rows);
-      for (let i = 0; i < cells.length; i++) {
-        cells[i] = Math.random() > 0.5 ? "1" : "0";
-      }
-    }
-  }
-}
-
-window.addEventListener("resize", updateCanvasSize);
-window.addEventListener("scroll", updateCanvasSize);
-window.addEventListener("load", updateCanvasSize);
-
-let cells = [];
 let cols = 0;
 let rows = 0;
+let cells;
+let baseNoise;
 
-function rebuildGrid() {
-  // Aggiorna sempre la larghezza e altezza
-  canvas.width = document.documentElement.scrollWidth;
-  canvas.height = document.documentElement.scrollHeight;
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
   cols = Math.ceil(canvas.width / settings.cellSize);
   rows = Math.ceil(canvas.height / settings.cellSize);
 
-  // Ricrea la griglia solo se cambia il numero di celle
-  if (!cells || cells.length !== cols * rows) {
-    cells = new Array(cols * rows);
-    for (let i = 0; i < cells.length; i++) {
-      cells[i] = Math.random() > 0.5 ? "1" : "0";
-    }
+  cells = new Uint8Array(cols * rows);
+  baseNoise = new Float32Array(cols * rows);
+
+  for (let i = 0; i < cells.length; i++) {
+    cells[i] = Math.random() > 0.5 ? 49 : 48; // ASCII 1 / 0
+    baseNoise[i] = Math.random() * 10;
   }
 
   ctx.font = `${settings.cellSize}px monospace`;
@@ -110,21 +78,29 @@ function rebuildGrid() {
   ctx.textBaseline = "middle";
 }
 
-window.addEventListener("resize", rebuildGrid);
-// window.addEventListener("scroll", rebuildGrid);
-window.addEventListener("load", rebuildGrid);
+window.addEventListener("resize", resize);
+resize();
 
 /* ================= DRAW ================= */
 
-function getTextColor() {
-  return (document.body.getAttribute("data-theme") === "dark")
+const frameTime = 1000 / settings.fps;
+let last = 0;
+
+function getColor() {
+  return document.body.getAttribute("data-theme") === "dark"
     ? "#ffffff"
     : "#000000";
 }
 
 function draw(time) {
+  if (time - last < frameTime) {
+    requestAnimationFrame(draw);
+    return;
+  }
+  last = time;
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = getTextColor();
+  ctx.fillStyle = getColor();
 
   const t = time * settings.timeScale;
   let lastAlpha = -1;
@@ -133,19 +109,26 @@ function draw(time) {
     for (let x = 0; x < cols; x++) {
       const i = y * cols + x;
 
+      // DOMAIN WARPING LEGGERO (addio onde)
+      const warp =
+        perlin(
+          x * settings.noiseScale + baseNoise[i],
+          y * settings.noiseScale + baseNoise[i]
+        ) * 0.5;
+
       let n = perlin(
-        x * settings.noiseScale + t,
-        y * settings.noiseScale + t * 0.7
+        x * settings.noiseScale + warp + t,
+        y * settings.noiseScale + warp - t
       );
 
       n = n * 0.5 + 0.5;
       n = Math.pow(n, settings.contrast);
 
-      let alpha =
+      const alpha =
         settings.opacityMin +
         n * (settings.opacityMax - settings.opacityMin);
 
-      if (alpha < 0.01) continue;
+      if (alpha < 0.04) continue;
 
       if (alpha !== lastAlpha) {
         ctx.globalAlpha = alpha;
@@ -153,7 +136,7 @@ function draw(time) {
       }
 
       ctx.fillText(
-        cells[i],
+        String.fromCharCode(cells[i]),
         x * settings.cellSize + settings.cellSize * 0.5,
         y * settings.cellSize + settings.cellSize * 0.5
       );

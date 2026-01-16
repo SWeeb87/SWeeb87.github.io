@@ -80,3 +80,27 @@ function updateCanvasColor() {
 // EVENTO CLICK PULSANTE
 // -----------------------
 toggleBtn.addEventListener("click", toggleTheme);
+
+function updateCardBlur() {
+  const aboutCard = document.querySelector('.about-card');
+  if (!aboutCard) return;
+
+  const isDark = document.body.getAttribute('data-theme') === 'dark';
+  const blurValue = isDark ? 3 : 2;
+
+  // Applica il blur dinamicamente
+  aboutCard.style.backdropFilter = `blur(${blurValue}px)`;
+  aboutCard.style.webkitBackdropFilter = `blur(${blurValue}px)`;
+}
+
+// Aggiorna al caricamento
+window.addEventListener('load', updateCardBlur);
+
+// Aggiorna al cambio tema (se hai un toggle JS)
+const themeToggle = document.getElementById('theme-toggle');
+if (themeToggle) {
+  themeToggle.addEventListener('click', () => {
+    // piccolo delay se il tema cambia con animazione
+    setTimeout(updateCardBlur, 100);
+  });
+}

@@ -1,11 +1,3 @@
-// Scroll al click del pulsante
-const scrollBtn = document.getElementById("scroll-btn");
-const projectsSection = document.getElementById("projects");
-
-scrollBtn.addEventListener("click", () => {
-  projectsSection.scrollIntoView({ behavior: "smooth" });
-});
-
 // Hint scroll: scompare quando scrolli
 const scrollHintContainer = document.getElementById("scroll-hint-container");
 const scrollHintText = document.getElementById("scroll-hint-text");
@@ -46,6 +38,17 @@ aboutBtn.addEventListener("click", () => {
   const offset = window.innerHeight * 0.35; // leggermente sotto
   window.scrollTo({
     top: aboutSection.offsetTop - offset,
+    behavior: "smooth"
+  });
+});
+
+const projectsBtn = document.getElementById("projects-btn");
+const projectsSection = document.getElementById("game-1");
+
+projectsBtn.addEventListener("click", () => {
+  const offset = window.innerHeight * 0.35; // leggermente sotto
+  window.scrollTo({
+    top: projectsSection.offsetTop - offset,
     behavior: "smooth"
   });
 });

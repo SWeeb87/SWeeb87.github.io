@@ -1,106 +1,98 @@
-// -----------------------
+// =======================
 // ELEMENTI
-// -----------------------
+// =======================
 const toggleBtn = document.getElementById("theme-toggle");
 const toggleImg = document.getElementById("theme-toggle-img");
-const overlay = document.getElementById("theme-fade-overlay");
+const overlay   = document.getElementById("theme-fade-overlay");
 
-// -----------------------
-// IMPOSTAZIONI IMMAGINI
-// -----------------------
+// =======================
+// CONFIG
+// =======================
 const toggleImages = {
   light: "./Assets/Light Toggle.png",
   dark: "./Assets/Dark Toggle.png"
 };
 
-// -----------------------
-// FUNZIONE SET THEME
-// -----------------------
+const BLUR_LIGHT = 2;
+const BLUR_DARK  = 4;
+
+// =======================
+// UTILITY
+// =======================
+function setBlur(selector, amount) {
+  document.querySelectorAll(selector).forEach(el => {
+    el.style.backdropFilter = `blur(${amount}px)`;
+    el.style.webkitBackdropFilter = `blur(${amount}px)`;
+  });
+}
+
+// =======================
+// CANVAS
+// =======================
+function updateCanvasColor(theme) {
+  if (!window.backgroundCanvasCtx) return;
+  window.backgroundCanvasCtx.fillStyle =
+    theme === "dark" ? "#ffffff" : "#000000";
+}
+
+// =======================
+// BLUR PER TEMA
+// =======================
+function updateBlurByTheme(theme) {
+  setBlur(".frosted", theme === "dark" ? BLUR_DARK : BLUR_LIGHT);
+}
+
+// =======================
+// SET THEME (PUNTO UNICO)
+// =======================
 function setTheme(theme) {
   document.body.setAttribute("data-theme", theme);
   localStorage.setItem("theme-preference", theme);
 
-  // Cambia immagine toggle
-  toggleImg.src = theme === "dark" ? toggleImages.dark : toggleImages.light;
+  toggleImg.src =
+    theme === "dark" ? toggleImages.dark : toggleImages.light;
 
-  // Aggiorna colore canvas
-  updateCanvasColor();
+  updateCanvasColor(theme);
+  updateBlurByTheme(theme);
 }
 
-// -----------------------
-// FUNZIONE TOGGLE
-// -----------------------
+// =======================
+// TOGGLE THEME
+// =======================
 function toggleTheme() {
   const current = document.body.getAttribute("data-theme") || "light";
   const next = current === "dark" ? "light" : "dark";
 
-  // Mostra overlay opaco per sincronizzare il fade
-  overlay.style.transition = "none"; // resetto eventuali transizioni precedenti
-  overlay.style.opacity = 1;
+  // overlay per fade sincronizzato
+  overlay.style.transition = "none";
+  overlay.style.opacity = "1";
 
-  // Cambia il tema subito
+  // forza repaint
+  overlay.offsetHeight;
+
   setTheme(next);
 
-  // Forzo il reflow per assicurare la transizione
-  overlay.offsetHeight; 
-
-  // Fade out overlay
   overlay.style.transition = "opacity 0.5s ease";
-  overlay.style.opacity = 0;
+  overlay.style.opacity = "0";
 }
 
-// -----------------------
-// FUNZIONE AGGIORNA CANVAS
-// -----------------------
-function updateCanvasColor() {
-  // Legge il tema corrente e aggiorna il canvas globalmente
-  const theme = document.body.getAttribute("data-theme") || "light";
-  const canvasTextColor = theme === "dark" ? "#ffffff" : "#000000";
-  if (window.backgroundCanvasCtx) {
-    window.backgroundCanvasCtx.fillStyle = canvasTextColor;
-  }
-}
-
-// -----------------------
-// INIZIALIZZAZIONE PAGINA
-// -----------------------
+// =======================
+// INIT
+// =======================
 (function initTheme() {
-  const savedTheme = localStorage.getItem("theme-preference");
+  const saved = localStorage.getItem("theme-preference");
 
-  if (savedTheme) {
-    setTheme(savedTheme);
+  if (saved) {
+    setTheme(saved);
   } else {
-    // Usa preferenza di sistema
-    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    setTheme(systemPrefersDark ? "dark" : "light");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    setTheme(prefersDark ? "dark" : "light");
   }
 })();
 
-// -----------------------
-// EVENTO CLICK PULSANTE
-// -----------------------
-toggleBtn.addEventListener("click", toggleTheme);
-
-function updateCardBlur() {
-  const aboutCard = document.querySelector('.about-card');
-  if (!aboutCard) return;
-
-  const isDark = document.body.getAttribute('data-theme') === 'dark';
-  const blurValue = isDark ? 3 : 2;
-
-  // Applica il blur dinamicamente
-  aboutCard.style.backdropFilter = `blur(${blurValue}px)`;
-  aboutCard.style.webkitBackdropFilter = `blur(${blurValue}px)`;
-}
-
-// Aggiorna al caricamento
-window.addEventListener('load', updateCardBlur);
-
-// Aggiorna al cambio tema (se hai un toggle JS)
-const themeToggle = document.getElementById('theme-toggle');
-if (themeToggle) {
-  themeToggle.addEventListener('click', () => {
-    // piccolo delay se il tema cambia con animazione
-    setTimeout(updateCardBlur, 100);
-  });
+// =======================
+// EVENTI
+// =======================
+if (toggleBtn) {
+  toggleBtn.addEventListener("click", toggleTheme);
 }

@@ -46,7 +46,7 @@ const projectsBtn = document.getElementById("projects-btn");
 const projectsSection = document.getElementById("game-1");
 
 projectsBtn.addEventListener("click", () => {
-  const offset = window.innerHeight * 0.35; // leggermente sotto
+  const offset = window.innerHeight * 0.38; // leggermente sotto
   window.scrollTo({
     top: projectsSection.offsetTop - offset,
     behavior: "smooth"

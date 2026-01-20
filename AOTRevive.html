@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Projects | AOT Revive</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="icon" type="image/png" href="./Assets/favicon.png">
+</head>
+
+<script>
+  window.addEventListener("load", () => {
+    const buttons = document.querySelector(".main-buttons");
+    const projectsSection = document.querySelector(".projects-section");
+
+    function updateProjectsPosition() {
+      const buttonsRect = buttons.getBoundingClientRect();
+      const scrollY = window.scrollY || window.pageYOffset;
+      const bottom = buttonsRect.bottom + scrollY;
+
+      // imposta margin-top solo sulla sezione progetti
+      projectsSection.style.marginTop = (bottom + -500) + "px"; // 30px gap
+    }
+
+    updateProjectsPosition();
+    window.addEventListener("resize", updateProjectsPosition);
+  });
+</script>
+
+
+<body>
+  <div id="theme-fade-overlay"></div>
+  <div id="screen-fade"></div>
+  <canvas id="background-canvas"></canvas>
+  <header class="header">
+
+    <div id="theme-toggle">
+      <img id="theme-toggle-img" src="./Assets/Light Toggle.png" alt="Toggle Theme">
+    </div>
+
+    <div id="lang-toggle" title="Lang Toggle">EN</div>
+
+    <div id="scroll-hint-container">
+      <p class="scrollHintText" data-lang="scrollHintText" id="scroll-hint-text">Scroll down
+      </p>
+      <img id="scroll-hint-arrow" src="./Assets/Scroll Down Arrow.png" alt="Freccia scroll" />
+    </div>
+
+    <div id="back-to-top">
+      <img src="./Assets/Back to Top.png" alt="Back to Top">
+    </div>
+
+    <div style="height: 100px;"></div>
+
+    <script src="./js/projects.js"></script>
+    <script src="./js/scroll.js"></script>
+    <script src="./js/background.js"></script>
+    <script src="./js/slideShow.js"></script>
+    <script src="./js/themeToggle.js" defer></script>
+    <script src="./js/langToggle.js" defer></script>
+    <script src="./js/resumeDownload.js" defer></script>
+
+</body>
+<div id="theme-fade-overlay"></div>
+
+</html>

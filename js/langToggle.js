@@ -13,7 +13,16 @@ In my spare time I also design and build tech projects, like a fully autonomous 
       projects: "PROJECTS",
       resume: "RESUME",
       about: "ABOUT ME",
-      scrollHintText: "Scroll down"
+      scrollHintText: "Scroll down",
+      projectsIntroduction: "PERSONAL PROJECTS",
+      game1A: "My first ever game, developed in 1 year and published for Meta Quest 2, later 3, in 2021. And later updated and polished over the course of 3 years.",
+      game1B: "Born from the desire to play a VR game from a series i like. Gathered 85.000+ downloads and created a community of dedicated fans.",
+      game2A: "My second VR project, aiming at creating a true horror experience utilizing everything VR has to offer. And creating a spiritual successor to the Silent Hill series, taking inspiration from SH2 and SH3.",
+      game2B: "This project helped me create new optimization tools thanks to the demanding graphics standards i set myself. Unfortunately the project's development is on hold.",
+      game3A: "A simple puzzle game made for the 2024 GMTK Game Jam, landing 1564th place in 7539 entries.",
+      game3B: "CURBIT focuses on the Rubik's cube puzzle formula, and adds an \"electric\" spin, with live circuitsthat update as the faces of the cube move.",
+      game4A: "This is my second electronics project, after the LED Matrix Clock. I wanted to experiment with photogrammetry and i also needed a custom grip for my bow.",
+      game4B: "Other than just designing the electronics, this time, i also had to create the whole structure of the machine, think about the weight distrubution and lense setup."
     },
     IT: {
       subtitle: "Sviluppatore Unity VR per Gameplay e Performance",
@@ -25,7 +34,16 @@ Nel tempo libero progetto e costruisco anche progetti tecnologici, come uno Scan
       projects: "PROGETTI",
       resume: "CURRICULUM",
       about: "CHI SONO",
-      scrollHintText: "Scendi giù"
+      scrollHintText: "Scendi giù",
+      projectsIntroduction: "PROGETTI PERSONALI",
+      game1A: "Il mio primo gioco in assoluto, sviluppato in 1 anno e pubblicato nel 2021 per Meta Quest 2 e successivamente Quest 3. In seguito aggiornato e rifinito nel corso di 3 anni.",
+      game1B: "Nato dal desiderio di giocare a un titolo VR appartenente a una serie che amo. Ha superato gli 85.000 download e dato vita a una community di fan dedicati.",
+      game2A: "Il mio secondo progetto VR, con l\’obiettivo di creare una vera esperienza horror sfruttando tutto ciò che la VR ha da offrire, e di realizzare un successore spirituale della serie Silent Hill, ispirandosi a SH2 e SH3.",
+      game2B: "Questo progetto mi ha permesso di sviluppare nuovi strumenti di ottimizzazione grazie agli elevati standard grafici che mi ero imposto.",
+      game3A: "Un semplice puzzle game realizzato per la GMTK Game Jam 2024, che si è classificato al 1564º posto su 7539 partecipanti.",
+      game3B: "CURBIT riprende la formula dei puzzle basati sul Cubo di Rubik e aggiunge una svolta \"elettrica\", con circuiti attivi che si aggiornano in tempo reale mentre le facce del cubo si muovono.",
+      game4A: "Questo è il mio secondo progetto di elettronica, dopo L’Orologio a Matrice LED. Volevo sperimentare con la fotogrammetria e avevo anche bisogno di un’impugnatura personalizzata per il mio arco.",
+      game4B: "Oltre alla progettazione dell’elettronica, questa volta ho dovuto realizzare l’intera struttura della macchina, studiando la distribuzione del peso e la configurazione delle lenti."
     }
   };
 
@@ -56,11 +74,38 @@ Nel tempo libero progetto e costruisco anche progetti tecnologici, come uno Scan
       aboutParagraphs[1].textContent = translations[currentLang].aboutText2;
     }
 
+    const projectsIntroduction = document.querySelector(".projects-introduction p");
+    if (projectsIntroduction) projectsIntroduction.textContent = translations[currentLang].projectsIntroduction;
+
+    const game1Paragraphs = document.querySelectorAll("#game-1 p");
+    if (game1Paragraphs.length >= 2) {
+      game1Paragraphs[0].textContent = translations[currentLang].game1A;
+      game1Paragraphs[1].textContent = translations[currentLang].game1B;
+    }
+
+    const game2Paragraphs = document.querySelectorAll("#game-2 p");
+    if (game2Paragraphs.length >= 2) {
+      game2Paragraphs[0].textContent = translations[currentLang].game2A;
+      game2Paragraphs[1].textContent = translations[currentLang].game2B;
+    }
+
+    const game3Paragraphs = document.querySelectorAll("#game-3 p");
+    if (game3Paragraphs.length >= 2) {
+      game3Paragraphs[0].textContent = translations[currentLang].game3A;
+      game3Paragraphs[1].textContent = translations[currentLang].game3B;
+    }
+
+    const game4Paragraphs = document.querySelectorAll("#game-4 p");
+    if (game4Paragraphs.length >= 2) {
+      game4Paragraphs[0].textContent = translations[currentLang].game4A;
+      game4Paragraphs[1].textContent = translations[currentLang].game4B;
+    }
+    
     const scrollHintText = document.querySelector("[data-lang='scrollHintText']");
     if (scrollHintText) scrollHintText.textContent = translations[currentLang].scrollHintText;
 
     // pulsanti principali
-    const projectsBtn = document.querySelector("#scroll-btn span");
+    const projectsBtn = document.querySelector("#projects-btn span");
     if (projectsBtn) projectsBtn.textContent = translations[currentLang].projects;
 
     const resumeBtn = document.querySelector("#resume-btn span");

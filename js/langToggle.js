@@ -15,6 +15,7 @@ In my spare time I also design and build tech projects, like a fully autonomous 
       about: "ABOUT ME",
       scrollHintText: "Scroll down",
       projectsIntroduction: "PERSONAL PROJECTS",
+      backHome: "BACK",
       game1A: "My first ever game, developed in 1 year and published for Meta Quest 2, later 3, in 2021. And later updated and polished over the course of 3 years.",
       game1B: "Born from the desire to play a VR game from a series i like. Gathered 85.000+ downloads and created a community of dedicated fans.",
       game2A: "My second VR project, aiming at creating a true horror experience utilizing everything VR has to offer. And creating a spiritual successor to the Silent Hill series, taking inspiration from SH2 and SH3.",
@@ -36,6 +37,7 @@ Nel tempo libero progetto e costruisco anche progetti tecnologici, come uno Scan
       about: "CHI SONO",
       scrollHintText: "Scendi giù",
       projectsIntroduction: "PROGETTI PERSONALI",
+      backHome: "INDIETRO",
       game1A: "Il mio primo gioco in assoluto, sviluppato in 1 anno e pubblicato nel 2021 per Meta Quest 2 e successivamente Quest 3. In seguito aggiornato e rifinito nel corso di 3 anni.",
       game1B: "Nato dal desiderio di giocare a un titolo VR appartenente a una serie che amo. Ha superato gli 85.000 download e dato vita a una community di fan dedicati.",
       game2A: "Il mio secondo progetto VR, con l\’obiettivo di creare una vera esperienza horror sfruttando tutto ciò che la VR ha da offrire, e di realizzare un successore spirituale della serie Silent Hill, ispirandosi a SH2 e SH3.",
@@ -76,6 +78,9 @@ Nel tempo libero progetto e costruisco anche progetti tecnologici, come uno Scan
 
     const projectsIntroduction = document.querySelector(".projects-introduction p");
     if (projectsIntroduction) projectsIntroduction.textContent = translations[currentLang].projectsIntroduction;
+
+    const backtBtn = document.querySelector("#Back-btn span");
+    if (backtBtn) backtBtn.textContent = translations[currentLang].backHome;
 
     const game1Paragraphs = document.querySelectorAll("#game-1 p");
     if (game1Paragraphs.length >= 2) {
@@ -129,4 +134,13 @@ Nel tempo libero progetto e costruisco anche progetti tecnologici, come uno Scan
 
   // ---- 4. Inizializza ----
   updateTexts();
+
+  // Vai alla home quando clicchi
+const backBtn = document.getElementById("Back-btn");
+if (backBtn) {
+  backBtn.addEventListener("click", () => {
+    // usa il percorso corretto della home
+    window.location.href = "../index.html"; 
+  });
+}
 });
